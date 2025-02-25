@@ -1,0 +1,34 @@
+name: Bulk Upload with Git LFS
+
+on: [push]
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Git LFS
+      run: |
+        git lfs install
+        git lfs track "*.zip" "*.rar" "*.tar.gz" "*.iso" "*.exe" "*.mp4" "*.jpg" "*.png"
+        git add .gitattributes
+        git commit -m "Enable Git LFS"
+        git push
+
+    - name: Compress Large Files (Optional)
+      run: |
+        zip -r upload.zip . -x "*.git*"
+
+    - name: Configure Git
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Upload All Files
+      run: |
+        git add .
+        git commit -m "Bulk Upload with Git LFS"
+        git push
